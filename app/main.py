@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI, Depends, status, Response
+from fastapi import FastAPI, Depends, status, Response, HTTPException
 from notes import models, schemas
 from sqlalchemy.orm import Session
 
@@ -44,6 +44,7 @@ def note_details(id: int, responce: Response, db: Session = Depends(get_db)):
     
     if not note:
         responce.status_code = status.HTTP_404_NOT_FOUND
+        raise HTTPException(status_code=404, detail="No not with such id")
     return note
      
 
