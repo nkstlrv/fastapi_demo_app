@@ -9,7 +9,7 @@ engine = create_engine('sqlite:///./notes.db', connect_args={"check_same_thread"
 
 Base = declarative_base()
 
-Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+MySession = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 
 class Note(Base):
