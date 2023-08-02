@@ -1,5 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
+from notes import models, schemas
+
+models.Base.metadata.create_all(bind=models.engine)
 
 app = FastAPI()
 
@@ -10,4 +13,4 @@ def index():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run(app, host="127.0.0.1", port=8000)
