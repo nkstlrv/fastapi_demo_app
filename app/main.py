@@ -30,6 +30,18 @@ def note_create(request: schemas.Note, db: Session = Depends(get_db)):
      db.refresh(new_note)
      
      return new_note
+ 
+ 
+@app.get('/note/list')
+def note_list(db: Session = Depends(get_db)):
+    all_notes = db.query(models.Note).all()
+    return all_notes
+    
+    
+@app.get('/note/{id}')
+def note_details(id: int, db: Session = Depends(get_db)):
+    note = db.query(models.Note).filter(models.Note.id == id).first()
+    return note
      
 
 
