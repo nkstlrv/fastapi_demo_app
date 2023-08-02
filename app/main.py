@@ -44,8 +44,24 @@ def note_details(id: int, responce: Response, db: Session = Depends(get_db)):
     
     if not note:
         responce.status_code = status.HTTP_404_NOT_FOUND
-        raise HTTPException(status_code=404, detail="No not with such id")
+        raise HTTPException(status_code=404, detail="No note with such id")
     return note
+
+
+@app.delete('/note/delete/{id}', status_code=status.HTTP_204_NO_CONTENT)
+def note_destroy(id: int, responce: Response, db: Session = Depends(get_db)):
+    
+    note = db.query(models.Note).filter(models.Note.id == id).first()
+    
+    if note:
+        db.query(models.Note).filter(models.Note.id == id).delete(synchronize_session=False)
+        db.commit()
+        return {'message': 'Deleted'}
+    else:
+        responce.status_code = status.HTTP_404_NOT_FOUND
+        raise HTTPException(status_code=404, detail="No note with such id")
+        
+    
      
 
 
