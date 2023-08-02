@@ -66,11 +66,23 @@ def note_destroy(id: int, responce: Response, db: Session = Depends(get_db)):
 
 @app.put("/note/update/{id}", status_code=status.HTTP_202_ACCEPTED)
 def note_update(id: int, request: schemas.Note, db: Session = Depends(get_db)):
-    db.query(models.Note).filter(models.Note.id == id).update(
-        {"title": request.title, "body": request.body, "edited_at": datetime.utcnow()}
-    )
-    db.commit()
-    return {"message": "Eddited successfully"}
+    note = db.query(models.Note).filter(models.Note.id == id)
+
+    if not note.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No note with such id"
+        )
+
+    else:
+        note.update(
+            {
+                "title": request.title,
+                "body": request.body,
+                "edited_at": datetime.utcnow(),
+            }
+        )
+        db.commit()
+        return {'message': 'Updated successfully', 'note': note.first()}
 
 
 if __name__ == "__main__":
