@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, status
 from notes import models, schemas
 from sqlalchemy.orm import Session
 
@@ -22,7 +22,7 @@ def index():
     return {'message': 'Hello, there!'}
 
 
-@app.post('/note/create')
+@app.post('/note/create', status_code=status.HTTP_201_CREATED)
 def note_create(request: schemas.Note, db: Session = Depends(get_db)):
      new_note = models.Note(title=request.title, body=request.body)
      db.add(new_note)
