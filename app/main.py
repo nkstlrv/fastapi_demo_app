@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI, Depends, status
+from fastapi import FastAPI, Depends, status, Response
 from notes import models, schemas
 from sqlalchemy.orm import Session
 
@@ -38,9 +38,12 @@ def note_list(db: Session = Depends(get_db)):
     return all_notes
     
     
-@app.get('/note/{id}')
-def note_details(id: int, db: Session = Depends(get_db)):
+@app.get('/note/{id}', status_code=200)
+def note_details(id: int, responce: Response, db: Session = Depends(get_db)):
     note = db.query(models.Note).filter(models.Note.id == id).first()
+    
+    if not note:
+        responce.status_code = status.HTTP_404_NOT_FOUND
     return note
      
 
