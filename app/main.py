@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends, status, Response, HTTPException
 from notes import models, schemas
 from sqlalchemy.orm import Session
 from datetime import datetime
-from notes.password_encription import pwd_cxt
+from notes.hashing import pwd_cxt
 
 models.Base.metadata.create_all(bind=models.engine)
 
