@@ -1,8 +1,8 @@
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import Column, Integer, String, DateTime, Text
+from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey
 
 engine = create_engine(
     "mysql+pymysql://root:mysql@localhost/mysql",
@@ -23,6 +23,9 @@ class Note(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     edited_at = Column(DateTime, default=None)
 
+    user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User", back_populates="notes")
+
 
 class User(Base):
     __tablename__ = "users"
@@ -32,3 +35,5 @@ class User(Base):
     email = Column(String(255), nullable=False)
     password = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    notes = relationship("Blog", back_populates="user")
