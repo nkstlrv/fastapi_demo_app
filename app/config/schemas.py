@@ -15,8 +15,8 @@ class NoteList(BaseModel):
     created_at: str
     edited_at: str
 
-    class Config:
-        orm_mode = True
+    # class Config:
+    #     orm_mode = True
 
 
 class User(BaseModel):

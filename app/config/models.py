@@ -1,22 +1,7 @@
 from datetime import datetime
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey
-
-
-engine = create_engine(
-    "sqlite:///./notes.db", connect_args={"check_same_thread": False}
-)
-
-# engine = create_engine(
-#     "mysql+pymysql://root:mysql@localhost/mysql",
-#     connect_args={"charset": "utf8mb4"},
-# )
-
-Base = declarative_base()
-
-MySession = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+from .database import Base
 
 
 class Note(Base):
