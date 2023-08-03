@@ -150,7 +150,7 @@ def user_update_username(
 
 
 @app.put("/auth/user/update/password/{id}", status_code=status.HTTP_202_ACCEPTED)
-def user_update_username(
+def user_update_password(
     id: int, request: schemas.UserUpdatePassword, db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.id == id)
@@ -175,6 +175,20 @@ def user_update_username(
     user.update({"password": pwd_cxt.hash(request.password1)})
     db.commit()
     return {"message": "User's password updated successfully", "user": user.first()}
+
+
+@app.delete("/auth/user/delete/{id}", status_code=204)
+def user_destroy(id: int, db: Session = Depends(get_db)):
+    user_to_delete = db.query(models.User).filter(models.User.id == id)
+
+    if not user_to_delete.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No user with such id"
+        )
+
+    user_to_delete.delete(synchronize_session=False)
+    db.commit()
+    return {"message": "User successfully deleted"}
 
 
 if __name__ == "__main__":
