@@ -37,3 +37,8 @@ class UserUpdatePassword(BaseModel):
     # old_password: str
     password1: str
     password2: str
+
+
+class LoginSchema(BaseModel):
+    username: str
+    password: str
