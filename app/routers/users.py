@@ -5,10 +5,10 @@ from config.database import get_db
 from config.hashing import pwd_cxt
 
 
-router = APIRouter()
+router = APIRouter(tags=["Users"])
 
 
-@router.post("/auth/user/create", tags=["users"])
+@router.post("/auth/user/create")
 def user_create(request: schemas.User, db: Session = Depends(get_db)):
     hashed_password = pwd_cxt.hash(request.password)
 
@@ -22,13 +22,13 @@ def user_create(request: schemas.User, db: Session = Depends(get_db)):
     return {"message": "User created successfully", "user": new_user}
 
 
-@router.get("/auth/user/list", status_code=201, tags=["users"])
+@router.get("/auth/user/list", status_code=201)
 def user_list(db: Session = Depends(get_db)):
     users = db.query(models.User).all()
     return users
 
 
-@router.get("/auth/user/{id}", status_code=200, tags=["users"])
+@router.get("/auth/user/{id}", status_code=200)
 def user_detail(id: int, responce: Response, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if user:
@@ -39,7 +39,7 @@ def user_detail(id: int, responce: Response, db: Session = Depends(get_db)):
         )
 
 
-@router.get("/auth/user/notes/{id}", status_code=200, tags=["users"])
+@router.get("/auth/user/notes/{id}", status_code=200)
 def user_notes(id: int, responce: Response, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if user:
@@ -51,9 +51,7 @@ def user_notes(id: int, responce: Response, db: Session = Depends(get_db)):
         )
 
 
-@router.put(
-    "/auth/user/update/email/{id}", status_code=status.HTTP_202_ACCEPTED, tags=["users"]
-)
+@router.put("/auth/user/update/email/{id}", status_code=status.HTTP_202_ACCEPTED)
 def user_update_email(
     id: int, request: schemas.UserUpdateEmail, db: Session = Depends(get_db)
 ):
@@ -92,7 +90,6 @@ def user_update_username(
 @router.put(
     "/auth/user/update/password/{id}",
     status_code=status.HTTP_202_ACCEPTED,
-    tags=["users"],
 )
 def user_update_password(
     id: int, request: schemas.UserUpdatePassword, db: Session = Depends(get_db)
@@ -121,7 +118,7 @@ def user_update_password(
     return {"message": "User's password updated successfully", "user": user.first()}
 
 
-@router.delete("/auth/user/delete/{id}", status_code=204, tags=["users"])
+@router.delete("/auth/user/delete/{id}", status_code=204)
 def user_destroy(id: int, db: Session = Depends(get_db)):
     user_to_delete = db.query(models.User).filter(models.User.id == id)
 
