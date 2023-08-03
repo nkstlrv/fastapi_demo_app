@@ -82,7 +82,12 @@ def note_update(id: int, request: schemas.Note, db: Session = Depends(get_db)):
             }
         )
         db.commit()
-        return {'message': 'Updated successfully', 'note': note.first()}
+        return {"message": "Updated successfully", "note": note.first()}
+
+
+@app.post("/auth/user/create")
+def user_create(request: schemas.User, db: Session = Depends(get_db)):
+    return request
 
 
 if __name__ == "__main__":
