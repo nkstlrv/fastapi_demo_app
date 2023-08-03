@@ -117,5 +117,65 @@ def user_detail(id: int, responce: Response, db: Session = Depends(get_db)):
         )
 
 
+@app.put("/auth/user/update/email/{id}", status_code=status.HTTP_202_ACCEPTED)
+def user_update_email(
+    id: int, request: schemas.UserUpdateEmail, db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.id == id)
+
+    if not user.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No user with such id"
+        )
+
+    user.update({"email": request.email})
+    db.commit()
+    return {"message": "User's email updated successfully", "user": user.first()}
+
+
+@app.put("/auth/user/update/username/{id}", status_code=status.HTTP_202_ACCEPTED)
+def user_update_username(
+    id: int, request: schemas.UserUpdateUsername, db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.id == id)
+
+    if not user.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No user with such id"
+        )
+
+    user.update({"username": request.username})
+    db.commit()
+    return {"message": "User's username updated successfully", "user": user.first()}
+
+
+@app.put("/auth/user/update/password/{id}", status_code=status.HTTP_202_ACCEPTED)
+def user_update_username(
+    id: int, request: schemas.UserUpdatePassword, db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.id == id)
+
+    if not user.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No user with such id"
+        )
+
+    # if pwd_cxt.hash(request.old_password) != user.first().password:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Previous password is incorrect",
+    #     )
+
+    if request.password1 != request.password2:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Passwords do not match",
+        )
+
+    user.update({"password": pwd_cxt.hash(request.password1)})
+    db.commit()
+    return {"message": "User's password updated successfully", "user": user.first()}
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
