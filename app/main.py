@@ -19,12 +19,8 @@ app.include_router(authentication.router)
 
 
 @app.get("/")
-def index(user: auth_dependency, db: db_dependency):
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized"
-        )
-    return {"user": user}
+def index():
+    return {"message": "Hello, there!"}
 
 
 if __name__ == "__main__":
