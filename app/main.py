@@ -1,7 +1,7 @@
 from typing import Annotated
 
 import uvicorn
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends
 from routers import users, notes, authentication
 from config.database import Base, engine, get_db
 from routers.authentication import get_current_user
