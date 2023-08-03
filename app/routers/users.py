@@ -1,15 +1,20 @@
+from typing import Annotated
+
 from fastapi import APIRouter, status, Depends, Response, HTTPException
 from config import schemas, models
 from sqlalchemy.orm import Session
 from config.database import get_db
 from config.hashing import bcrypt_context
+from routers.authentication import get_current_user
 
+auth_dependency = Annotated[dict, Depends(get_current_user)]
+db_dependency = Annotated[dict, Depends(get_db)]
 
 router = APIRouter(tags=["Users"], prefix="/auth/user")
 
 
 @router.post("/create")
-def user_create(request: schemas.User, db: Session = Depends(get_db)):
+def user_create(request: schemas.User, db: db_dependency):
     hashed_password = bcrypt_context.hash(request.password)
 
     new_user = models.User(
@@ -23,13 +28,13 @@ def user_create(request: schemas.User, db: Session = Depends(get_db)):
 
 
 @router.get("/list", status_code=201)
-def user_list(db: Session = Depends(get_db)):
+def user_list(user: auth_dependency, db: db_dependency):
     users = db.query(models.User).all()
     return users
 
 
 @router.get("/{id}", status_code=200)
-def user_detail(id: int, responce: Response, db: Session = Depends(get_db)):
+def user_detail(user: auth_dependency, id: int, responce: Response, db: db_dependency):
     user = db.query(models.User).filter(models.User.id == id).first()
     if user:
         return user
@@ -40,7 +45,7 @@ def user_detail(id: int, responce: Response, db: Session = Depends(get_db)):
 
 
 @router.get("/notes/{id}", status_code=200)
-def user_notes(id: int, responce: Response, db: Session = Depends(get_db)):
+def user_notes(user: auth_dependency, id: int, responce: Response, db: db_dependency):
     user = db.query(models.User).filter(models.User.id == id).first()
     if user:
         notes = db.query(models.Note).filter(models.Note.user_id == id)
@@ -53,7 +58,7 @@ def user_notes(id: int, responce: Response, db: Session = Depends(get_db)):
 
 @router.put("/update/email/{id}", status_code=status.HTTP_202_ACCEPTED)
 def user_update_email(
-    id: int, request: schemas.UserUpdateEmail, db: Session = Depends(get_db)
+    user: auth_dependency, id: int, request: schemas.UserUpdateEmail, db: db_dependency
 ):
     user = db.query(models.User).filter(models.User.id == id)
 
@@ -72,7 +77,10 @@ def user_update_email(
     status_code=status.HTTP_202_ACCEPTED,
 )
 def user_update_username(
-    id: int, request: schemas.UserUpdateUsername, db: Session = Depends(get_db)
+    user: auth_dependency,
+    id: int,
+    request: schemas.UserUpdateUsername,
+    db: db_dependency,
 ):
     user = db.query(models.User).filter(models.User.id == id)
 
@@ -91,7 +99,10 @@ def user_update_username(
     status_code=status.HTTP_202_ACCEPTED,
 )
 def user_update_password(
-    id: int, request: schemas.UserUpdatePassword, db: Session = Depends(get_db)
+    user: auth_dependency,
+    id: int,
+    request: schemas.UserUpdatePassword,
+    db: db_dependency,
 ):
     user = db.query(models.User).filter(models.User.id == id)
 
@@ -118,7 +129,7 @@ def user_update_password(
 
 
 @router.delete("/delete/{id}", status_code=204)
-def user_destroy(id: int, db: Session = Depends(get_db)):
+def user_destroy(user: auth_dependency, id: int, db: db_dependency):
     user_to_delete = db.query(models.User).filter(models.User.id == id)
 
     if not user_to_delete.first():

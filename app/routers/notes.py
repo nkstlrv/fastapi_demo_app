@@ -10,10 +10,11 @@ from typing import Annotated
 router = APIRouter(tags=["Notes"], prefix="/note")
 
 auth_dependency = Annotated[dict, Depends(get_current_user)]
+db_dependency = Annotated[dict, Depends(get_db)]
 
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
-def note_create(request: schemas.Note, db: Session = Depends(get_db)):
+def note_create(user: auth_dependency, request: schemas.Note, db: db_dependency):
     new_note = models.Note(title=request.title, body=request.body, user_id=1)
     db.add(new_note)
     db.commit()
@@ -23,13 +24,13 @@ def note_create(request: schemas.Note, db: Session = Depends(get_db)):
 
 
 @router.get("/list")
-def note_list(user: auth_dependency, db: Session = Depends(get_db)):
+def note_list(user: auth_dependency, db: db_dependency):
     all_notes = db.query(models.Note).all()
     return all_notes
 
 
 @router.get("/{id}", status_code=200)
-def note_details(id: int, responce: Response, db: Session = Depends(get_db)):
+def note_details(user: auth_dependency, id: int, responce: Response, db: db_dependency):
     note = db.query(models.Note).filter(models.Note.id == id).first()
 
     if not note:
@@ -40,7 +41,7 @@ def note_details(id: int, responce: Response, db: Session = Depends(get_db)):
 
 @router.get("/by-user-id/{user_id}", status_code=200)
 def note_details_by_user_id(
-    user_id: int, responce: Response, db: Session = Depends(get_db)
+    user: auth_dependency, user_id: int, responce: Response, db: db_dependency
 ):
     note = db.query(models.Note).filter(models.Note.user_id == user_id).first()
 
@@ -51,7 +52,7 @@ def note_details_by_user_id(
 
 
 @router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def note_destroy(id: int, responce: Response, db: Session = Depends(get_db)):
+def note_destroy(user: auth_dependency, id: int, responce: Response, db: db_dependency):
     note = db.query(models.Note).filter(models.Note.id == id).first()
 
     if note:
@@ -66,7 +67,9 @@ def note_destroy(id: int, responce: Response, db: Session = Depends(get_db)):
 
 
 @router.put("/update/{id}", status_code=status.HTTP_202_ACCEPTED)
-def note_update(id: int, request: schemas.Note, db: Session = Depends(get_db)):
+def note_update(
+    user: auth_dependency, id: int, request: schemas.Note, db: db_dependency
+):
     note = db.query(models.Note).filter(models.Note.id == id)
 
     if not note.first():
