@@ -1,3 +1,3 @@
 from passlib.context import CryptContext
 
-pwd_cxt = CryptContext(schemes=["bcrypt"], deprecated="auto")
+bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

@@ -1,5 +1,4 @@
-from typing import Optional
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 
 
 class Note(BaseModel):
@@ -37,3 +36,17 @@ class UserUpdatePassword(BaseModel):
     # old_password: str
     password1: str
     password2: str
+
+
+class LoginSchema(BaseModel):
+    username: str
+    password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
