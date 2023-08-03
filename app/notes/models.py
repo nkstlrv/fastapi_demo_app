@@ -5,7 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, String, DateTime, Text
 
 engine = create_engine(
-    "sqlite:///./notes.db", connect_args={"check_same_thread": False}
+    "mysql+pymysql://root:mysql@localhost/mysql",
+    connect_args={"charset": "utf8mb4"},
 )
 
 Base = declarative_base()
