@@ -3,9 +3,13 @@ from config import schemas, models
 from sqlalchemy.orm import Session
 from datetime import datetime
 from config.database import get_db
+from .authentication import get_current_user
+from typing import Annotated
 
 
 router = APIRouter(tags=["Notes"], prefix="/note")
+
+auth_dependency = Annotated[dict, Depends(get_current_user)]
 
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
@@ -19,7 +23,7 @@ def note_create(request: schemas.Note, db: Session = Depends(get_db)):
 
 
 @router.get("/list")
-def note_list(db: Session = Depends(get_db)):
+def note_list(user: auth_dependency, db: Session = Depends(get_db)):
     all_notes = db.query(models.Note).all()
     return all_notes
 

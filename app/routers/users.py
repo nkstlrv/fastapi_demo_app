@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Depends, Response, HTTPException
 from config import schemas, models
 from sqlalchemy.orm import Session
 from config.database import get_db
-from config.hashing import pwd_cxt
+from config.hashing import bcrypt_context
 
 
 router = APIRouter(tags=["Users"], prefix="/auth/user")
@@ -10,7 +10,7 @@ router = APIRouter(tags=["Users"], prefix="/auth/user")
 
 @router.post("/create")
 def user_create(request: schemas.User, db: Session = Depends(get_db)):
-    hashed_password = pwd_cxt.hash(request.password)
+    hashed_password = bcrypt_context.hash(request.password)
 
     new_user = models.User(
         username=request.username, email=request.email, password=hashed_password
@@ -112,7 +112,7 @@ def user_update_password(
             detail="Passwords do not match",
         )
 
-    user.update({"password": pwd_cxt.hash(request.password1)})
+    user.update({"password": bcrypt_context.hash(request.password1)})
     db.commit()
     return {"message": "User's password updated successfully", "user": user.first()}
 
