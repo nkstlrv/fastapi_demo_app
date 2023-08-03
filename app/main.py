@@ -3,6 +3,7 @@ from fastapi import FastAPI, Depends, status, Response, HTTPException
 from notes import models, schemas
 from sqlalchemy.orm import Session
 from datetime import datetime
+from notes.password_encription import pwd_cxt
 
 models.Base.metadata.create_all(bind=models.engine)
 
@@ -87,13 +88,16 @@ def note_update(id: int, request: schemas.Note, db: Session = Depends(get_db)):
 
 @app.post("/auth/user/create")
 def user_create(request: schemas.User, db: Session = Depends(get_db)):
+    hashed_password = pwd_cxt.hash(request.password)
+
     new_user = models.User(
-        username=request.username, email=request.email, password=request.password
+        username=request.username, email=request.email, password=hashed_password
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return new_user
+
+    return {"message": "User created successfully", "user": new_user}
 
 
 @app.get("/auth/user/list")
