@@ -100,10 +100,21 @@ def user_create(request: schemas.User, db: Session = Depends(get_db)):
     return {"message": "User created successfully", "user": new_user}
 
 
-@app.get("/auth/user/list")
+@app.get("/auth/user/list", status_code=201)
 def user_list(db: Session = Depends(get_db)):
     users = db.query(models.User).all()
     return users
+
+
+@app.get("/auth/user/{id}", status_code=200)
+def user_detail(id: int, responce: Response, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+    if user:
+        return user
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No user with such id"
+        )
 
 
 if __name__ == "__main__":
