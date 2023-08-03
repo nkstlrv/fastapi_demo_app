@@ -87,7 +87,19 @@ def note_update(id: int, request: schemas.Note, db: Session = Depends(get_db)):
 
 @app.post("/auth/user/create")
 def user_create(request: schemas.User, db: Session = Depends(get_db)):
-    return request
+    new_user = models.User(
+        username=request.username, email=request.email, password=request.password
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+
+@app.get("/auth/user/list")
+def user_list(db: Session = Depends(get_db)):
+    users = db.query(models.User).all()
+    return users
 
 
 if __name__ == "__main__":
