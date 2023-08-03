@@ -5,10 +5,10 @@ from datetime import datetime
 from config.database import get_db
 
 
-router = APIRouter(tags=["Notes"])
+router = APIRouter(tags=["Notes"], prefix="/note")
 
 
-@router.post("/note/create", status_code=status.HTTP_201_CREATED)
+@router.post("/create", status_code=status.HTTP_201_CREATED)
 def note_create(request: schemas.Note, db: Session = Depends(get_db)):
     new_note = models.Note(title=request.title, body=request.body, user_id=1)
     db.add(new_note)
@@ -18,13 +18,13 @@ def note_create(request: schemas.Note, db: Session = Depends(get_db)):
     return new_note
 
 
-@router.get("/note/list")
+@router.get("/list")
 def note_list(db: Session = Depends(get_db)):
     all_notes = db.query(models.Note).all()
     return all_notes
 
 
-@router.get("/note/{id}", status_code=200)
+@router.get("/{id}", status_code=200)
 def note_details(id: int, responce: Response, db: Session = Depends(get_db)):
     note = db.query(models.Note).filter(models.Note.id == id).first()
 
@@ -34,7 +34,7 @@ def note_details(id: int, responce: Response, db: Session = Depends(get_db)):
     return note
 
 
-@router.get("/note/by-user-id/{user_id}", status_code=200)
+@router.get("/by-user-id/{user_id}", status_code=200)
 def note_details_by_user_id(
     user_id: int, responce: Response, db: Session = Depends(get_db)
 ):
@@ -46,7 +46,7 @@ def note_details_by_user_id(
     return note
 
 
-@router.delete("/note/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def note_destroy(id: int, responce: Response, db: Session = Depends(get_db)):
     note = db.query(models.Note).filter(models.Note.id == id).first()
 
@@ -61,7 +61,7 @@ def note_destroy(id: int, responce: Response, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No note with such id")
 
 
-@router.put("/note/update/{id}", status_code=status.HTTP_202_ACCEPTED)
+@router.put("/update/{id}", status_code=status.HTTP_202_ACCEPTED)
 def note_update(id: int, request: schemas.Note, db: Session = Depends(get_db)):
     note = db.query(models.Note).filter(models.Note.id == id)
 
