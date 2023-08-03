@@ -5,6 +5,18 @@ from pydantic import BaseModel, Field, validator
 class Note(BaseModel):
     title: str
     body: str
+    # user_id: int
+
+
+class NoteList(BaseModel):
+    title: str
+    body: str
+    user_id: int
+    created_at: str
+    edited_at: str
+
+    class Config:
+        orm_mode = True
 
 
 class User(BaseModel):

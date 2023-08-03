@@ -26,7 +26,7 @@ def index():
 
 @app.post("/note/create", status_code=status.HTTP_201_CREATED, tags=["notes"])
 def note_create(request: schemas.Note, db: Session = Depends(get_db)):
-    new_note = models.Note(title=request.title, body=request.body)
+    new_note = models.Note(title=request.title, body=request.body, user_id=1)
     db.add(new_note)
     db.commit()
     db.refresh(new_note)
@@ -43,6 +43,18 @@ def note_list(db: Session = Depends(get_db)):
 @app.get("/note/{id}", status_code=200, tags=["notes"])
 def note_details(id: int, responce: Response, db: Session = Depends(get_db)):
     note = db.query(models.Note).filter(models.Note.id == id).first()
+
+    if not note:
+        responce.status_code = status.HTTP_404_NOT_FOUND
+        raise HTTPException(status_code=404, detail="No note with such id")
+    return note
+
+
+@app.get("/note/by-user-id/{user_id}", status_code=200, tags=["notes"])
+def note_details_by_user_id(
+    user_id: int, responce: Response, db: Session = Depends(get_db)
+):
+    note = db.query(models.Note).filter(models.Note.user_id == user_id).first()
 
     if not note:
         responce.status_code = status.HTTP_404_NOT_FOUND
@@ -111,6 +123,18 @@ def user_detail(id: int, responce: Response, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if user:
         return user
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No user with such id"
+        )
+
+
+@app.get("/auth/user/notes/{id}", status_code=200, tags=["users"])
+def user_notes(id: int, responce: Response, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+    if user:
+        notes = db.query(models.Note).filter(models.Note.user_id == id)
+        return notes.all()
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="No user with such id"

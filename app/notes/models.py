@@ -4,10 +4,15 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey
 
+
 engine = create_engine(
-    "mysql+pymysql://root:mysql@localhost/mysql",
-    connect_args={"charset": "utf8mb4"},
+    "sqlite:///./notes.db", connect_args={"check_same_thread": False}
 )
+
+# engine = create_engine(
+#     "mysql+pymysql://root:mysql@localhost/mysql",
+#     connect_args={"charset": "utf8mb4"},
+# )
 
 Base = declarative_base()
 
@@ -23,7 +28,7 @@ class Note(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     edited_at = Column(DateTime, default=None)
 
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     user = relationship("User", back_populates="notes")
 
 
@@ -36,4 +41,4 @@ class User(Base):
     password = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    notes = relationship("Blog", back_populates="user")
+    notes = relationship("Note", back_populates="user")
