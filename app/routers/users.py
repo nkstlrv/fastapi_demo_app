@@ -70,7 +70,6 @@ def user_update_email(
 @router.put(
     "/update/username/{id}",
     status_code=status.HTTP_202_ACCEPTED,
-    tags=["users"],
 )
 def user_update_username(
     id: int, request: schemas.UserUpdateUsername, db: Session = Depends(get_db)
