@@ -2,15 +2,16 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-
-engine = create_engine(
-    "sqlite:///./notes.db", connect_args={"check_same_thread": False}
-)
-
+# SQLite
 # engine = create_engine(
-#     "mysql+pymysql://root:mysql@localhost/mysql",
-#     connect_args={"charset": "utf8mb4"},
+#     "sqlite:///./notes.db", connect_args={"check_same_thread": False}
 # )
+
+# MySQL
+engine = create_engine(
+    "mysql+pymysql://root:mysql@localhost/mysql",
+    connect_args={"charset": "utf8mb4"},
+)
 
 Base = declarative_base()
 
